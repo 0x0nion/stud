@@ -17,7 +17,7 @@ class TestRequestCredit:
 
         assert credit.creditId == response.creditId
         assert credit.termMonths == response.termMonths
-        assert credit.creditId == response.creditId
+        assert credit.account_id == user.account_1.id
 
         credit_db = CreditCrudDb.get_credit_by_id(db_session, response.creditId)
         assert amount == pytest.approx(credit_db.amount)
