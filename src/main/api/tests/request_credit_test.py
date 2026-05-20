@@ -9,9 +9,7 @@ from src.main.api.db.crud.credit_crud import CreditCrudDb
 @pytest.mark.api
 class TestRequestCredit:
     def test_request_credit(self, api_manager: ApiManager, db_session: Session, user_maker):
-        user = user_maker.user_1
-
-        response, user = api_manager.credit_steps.request_credit(user)
+        response, user = api_manager.credit_steps.request_credit(user_maker.user_1)
         assert response.balance == pytest.approx(user.account_1.balance)
 
         credit = api_manager.credit_steps.get_credit_history(user)
@@ -23,8 +21,7 @@ class TestRequestCredit:
         assert user.credit.amount == pytest.approx(credit_db.amount)
 
     def test_request_credit_invalid(self, api_manager: ApiManager, db_session: Session, user_maker):
-        user = user_maker.user_default
-        api_manager.credit_steps.request_credit_invalid_role(user)
+        api_manager.credit_steps.request_credit_invalid_role(user_maker.user_default)
 
-        credit = CreditCrudDb.get_credit_by_username(db_session, user.user.username)
+        credit = CreditCrudDb.get_credit_by_username(db_session, user_maker.user_default.user.username)
         assert not credit

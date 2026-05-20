@@ -7,6 +7,34 @@ from src.main.api.models.user_data_model import UserData
 class UserGenerator:
     def __init__(self, api_manager: ApiManager):
         self.api_manager = api_manager
+        self._user_1 = None
+        self._user_2 = None
+        self._user_default = None
+        self._user_with_credit = None
+
+    @property
+    def user_1(self):
+        if self._user_1 is None:
+            self._user_1 = self._generate(credit=True)
+        return self._user_1
+
+    @property
+    def user_2(self):
+        if self._user_2 is None:
+            self._user_2 = self._generate(credit=True)
+        return self._user_2
+
+    @property
+    def user_default(self):
+        if self._user_default is None:
+            self._user_default = self._generate()
+        return self._user_default
+
+    @property
+    def user_with_credit(self):
+        if self._user_with_credit is None:
+            self._user_with_credit = self._generate(credit=True, with_credit=True)
+        return self._user_with_credit
 
     def _create_user(self, credit=False):
         user_request = RandomModelGenerator.generate(CreateUserRequest)
@@ -50,19 +78,3 @@ class UserGenerator:
     def _generate(self, credit=False, with_credit=False):
         user_request = self._create_user(credit)
         return self._complete_user(user_request, with_credit)
-
-    @property
-    def user_1(self):
-        return self._generate(credit=True)
-
-    @property
-    def user_2(self):
-        return self._generate(credit=True)
-
-    @property
-    def user_default(self):
-        return self._generate()
-
-    @property
-    def user_with_credit(self):
-        return self._generate(credit=True, with_credit=True)
