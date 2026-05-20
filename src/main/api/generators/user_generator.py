@@ -25,23 +25,44 @@ class UserGenerator:
         user.account_1.balance = amount
         return user
 
-    def _complete_user(self, user_request):
+    def _get_credit(self, user):
+        response, user = self.api_manager.credit_steps.request_credit(user)
+        user.credit = response
+        return user
+
+    def _complete_user(self, user_request, with_credit=False):
         account1_response, account2_response = self._accounts(user_request)
 
+        credit = None
         user = UserData(
             user=user_request,
             account_1=account1_response,
-            account_2=account2_response
+            account_2=account2_response,
+            credit=credit
         )
 
         user = self._deposit(user)
 
+        if with_credit:
+            user = self._get_credit(user)
         return user
 
-    def generate(self):
-        user_request = self._create_user()
-        return self._complete_user(user_request)
+    def _generate(self, credit=False, with_credit=False):
+        user_request = self._create_user(credit)
+        return self._complete_user(user_request, with_credit)
 
-    def generate_credit_user(self):
-        user_request = self._create_user(credit=True)
-        return self._complete_user(user_request)
+    @property
+    def user_1(self):
+        return self._generate(credit=True)
+
+    @property
+    def user_2(self):
+        return self._generate(credit=True)
+
+    @property
+    def user_default(self):
+        return self._generate()
+
+    @property
+    def user_with_credit(self):
+        return self._generate(credit=True, with_credit=True)

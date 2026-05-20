@@ -1,5 +1,3 @@
-import random
-
 import pytest
 from sqlalchemy.orm import Session
 
@@ -10,23 +8,19 @@ from src.main.api.db.crud.credit_crud import CreditCrudDb
 @pytest.mark.api
 class TestRepayCredit:
     def test_repay_credit(self, api_manager: ApiManager, db_session: Session, user_maker):
-        user = user_maker(credit=True)
-        credit_info, amount = api_manager.credit_steps.request_credit(user)
+        user = user_maker.user_with_credit
 
-        response = api_manager.credit_steps.repay_credit(user=user, amount=amount, credit_id=credit_info.creditId)
+        response = api_manager.credit_steps.repay_credit(user)
 
-        assert response.creditId == credit_info.creditId
-        assert response.amountDeposited == pytest.approx(amount)
+        assert response.creditId == user.credit.creditId
+        assert response.amountDeposited == pytest.approx(user.credit.amount)
 
     def test_repay_credit_invalid(self, api_manager: ApiManager, db_session: Session, user_maker):
-        user = user_maker(credit=True)
-        credit_info, amount = api_manager.credit_steps.request_credit(user)
+        user = user_maker.user_with_credit
 
-        repay_amount = amount * 0.9
-
-        api_manager.credit_steps.repay_credit_invalid(user=user, amount=repay_amount, credit_id=credit_info.creditId)
+        api_manager.credit_steps.repay_credit_invalid(user=user)
 
         credit = CreditCrudDb.get_credit_by_username(db_session, user.user.username)
 
-        assert credit.amount == pytest.approx(amount)
-        assert credit.id == credit_info.creditId
+        assert credit.amount == pytest.approx(user.credit.amount)
+        assert credit.id == user.credit.creditId

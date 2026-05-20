@@ -65,7 +65,10 @@ class AccountSteps(BaseSteps):
             response_spec=ResponseSpecs.request_ok()
         ).post(account_transfer_request)
 
-        return response, amount
+        user_1.account_1.balance = user_1.account_1.balance - amount
+        user_2.account_1.balance = user_2.account_1.balance + amount
+
+        return response, user_1, user_2
 
     def account_transfer_invalid(self, user_1: UserData, user_2: UserData, amount: float):
         account_transfer_request = AccountTransferRequest(

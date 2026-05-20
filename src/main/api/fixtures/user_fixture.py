@@ -24,7 +24,7 @@ def create_user_with_account(api_manager: ApiManager):
         user=user_request,
         account_1=account_response,
         account_2=None,
-
+        credit=None
     )
 
 
@@ -38,18 +38,11 @@ def create_user_max_accounts(api_manager: ApiManager):
     return UserData(
         user=user_request,
         account_1=account1_response,
-        account_2=account2_response
+        account_2=account2_response,
+        credit=None
     )
 
 
 @pytest.fixture
 def user_maker(api_manager: ApiManager):
-    factory = UserGenerator(api_manager)
-
-    def _make(credit=False):
-        if credit:
-            return factory.generate_credit_user()
-        return factory.generate()
-
-    return _make
-
+    return UserGenerator(api_manager)

@@ -34,7 +34,10 @@ class CreditSteps(BaseSteps):
             response_spec=ResponseSpecs.request_created()
         ).post(credit_request_request)
 
-        return response, amount
+        user.account_1.balance = user.account_1.balance + amount
+        user.credit = response
+
+        return response, user
 
     def request_credit_invalid_role(self, user: UserData):
         amount = round(random.uniform(5000, 15000), 2)
@@ -54,11 +57,11 @@ class CreditSteps(BaseSteps):
             response_spec=ResponseSpecs.request_forbidden()
         ).post(credit_request_request)
 
-    def repay_credit(self, user: UserData, amount: float, credit_id: int):
+    def repay_credit(self, user: UserData):
         credit_repay_request = CreditRepayRequest(
-            creditId=credit_id,
+            creditId=user.credit.creditId,
             accountId=user.account_1.id,
-            amount=amount
+            amount=user.credit.amount
         )
 
         response = ValidateCrudRequester(
@@ -72,11 +75,11 @@ class CreditSteps(BaseSteps):
 
         return response
 
-    def repay_credit_invalid(self, user: UserData, amount: float, credit_id: int):
+    def repay_credit_invalid(self, user: UserData):
         credit_repay_request = CreditRepayRequest(
-            creditId=credit_id,
+            creditId=user.credit.creditId,
             accountId=user.account_1.id,
-            amount=amount
+            amount=user.credit.amount * 0.9
         )
 
         CrudRequester(
@@ -87,6 +90,7 @@ class CreditSteps(BaseSteps):
             endpoint=Endpoint.CREDIT_REPAY,
             response_spec=ResponseSpecs.requset_unprocessable_entity()
         ).post(credit_repay_request)
+
 
     def get_credit_history(self, user: UserData):
         response = ValidateCrudRequester(
