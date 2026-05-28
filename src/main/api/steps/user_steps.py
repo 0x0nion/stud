@@ -32,3 +32,4 @@ class UserSteps(BaseSteps):
                 response = requester.crud_requester.post(None)
                 requester.response_spec(response)
                 return response
+
